@@ -1,0 +1,43 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug selected app",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/screen_desktop",
+            "args": [
+                "--fs-root",
+                "${config:screenDesktop.appPath}/fs",
+                "--workspace",
+                "${config:screenDesktop.appPath}"
+            ],
+            "cwd": "${workspaceFolder}/build",
+            "preLaunchTask": "Build",
+            "sourceLanguages": [
+                "rust",
+                "c",
+                "cpp"
+            ]
+        },
+        {
+            "name": "Debug api-examples",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build-api-examples/screen_desktop",
+            "args": [
+                "--fs-root",
+                "${workspaceFolder}/examples/api-examples/fs",
+                "--workspace",
+                "${workspaceFolder}/examples/api-examples"
+            ],
+            "cwd": "${workspaceFolder}/build-api-examples",
+            "preLaunchTask": "Build api-examples",
+            "sourceLanguages": [
+                "rust",
+                "c",
+                "cpp"
+            ]
+        }
+    ]
+}

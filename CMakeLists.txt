@@ -26,7 +26,7 @@ option(APP_DEV_PREVIEW "Enable the selected app's dev-screen-preview feature" OF
 if(APP_PATH STREQUAL "")
     message(FATAL_ERROR
         "APP_PATH is required and must point to an external project_app crate.\n"
-        "For the bundled fixture use: -DAPP_PATH=${CMAKE_SOURCE_DIR}/tests/simulator-test")
+    "For a bundled example use: -DAPP_PATH=${CMAKE_SOURCE_DIR}/examples/hello_world")
 endif()
 get_filename_component(APP_DIR "${APP_PATH}" REALPATH BASE_DIR "${CMAKE_SOURCE_DIR}")
 if(NOT EXISTS "${APP_DIR}/Cargo.toml")
@@ -164,12 +164,17 @@ add_custom_target(rustapp ALL
 
 set(PROFILES_SRC "${APP_DIR}/config/profiles.json")
 set(PROFILES_JKV "${APP_DIR}/fs/lfs1/profiles.jkv")
+set(PROFILES_TOOL "${APP_DIR}/tools/build_profiles.py")
 if(EXISTS "${PROFILES_SRC}")
+    if(NOT EXISTS "${PROFILES_TOOL}")
+        message(FATAL_ERROR
+            "App provides config/profiles.json but is missing tools/build_profiles.py: ${APP_DIR}")
+    endif()
     add_custom_command(
         OUTPUT "${PROFILES_JKV}"
-        COMMAND python3 "${CMAKE_SOURCE_DIR}/tools/build_profiles.py"
+        COMMAND python3 "${PROFILES_TOOL}"
             --src "${PROFILES_SRC}" --out "${PROFILES_JKV}"
-        DEPENDS "${PROFILES_SRC}" "${CMAKE_SOURCE_DIR}/tools/build_profiles.py"
+        DEPENDS "${PROFILES_SRC}" "${PROFILES_TOOL}"
         COMMENT "Encoding profiles JKV: ${APP_NAME}"
     )
     add_custom_target(profiles_jkv ALL DEPENDS "${PROFILES_JKV}")

@@ -1,7 +1,11 @@
 /build*/
+/.vscode/
+/releases/
 /rust/app_selected
+/rust/Cargo.lock
 /rust/target/
 /target/
+/tools/.venv/
 .DS_Store
 .env
 .envrc

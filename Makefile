@@ -1,4 +1,4 @@
-APP_PATH ?= $(CURDIR)/tests/simulator-test
+APP_PATH ?= $(CURDIR)/examples/hello_world
 BUILD_DIR ?= build
 BUILD_TYPE ?= Debug
 

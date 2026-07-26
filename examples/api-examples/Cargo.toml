@@ -15,5 +15,6 @@ force-http-api = []
 dev-screen-preview = []
 
 [dependencies]
+fonts-cache = { workspace = true }
 jetbeep_core = { workspace = true, features = ["platform-desktop"] }
-log = "0.4"
+lvgl-dsl = { workspace = true }

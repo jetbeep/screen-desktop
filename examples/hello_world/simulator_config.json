@@ -1,0 +1,21 @@
+{
+  "device_settings": {
+    "crc32_hash": 0
+  },
+  "lockers": [
+    {
+      "width": 24,
+      "depth": 24,
+      "open_check_policy": "none",
+      "cells": [
+        {
+          "cell_name": "Example",
+          "height": 24,
+          "size": "Demo",
+          "board_id": 0,
+          "lock_id": 1
+        }
+      ]
+    }
+  ]
+}

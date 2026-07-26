@@ -25,6 +25,9 @@ const APP_SERVICE_MENU: i32 = LaunchTarget::ServiceMenu as i32;
 static CURRENT_APP: AtomicI32 = AtomicI32::new(APP_NONE);
 
 fn app_teardown() {
+    jetbeep_core::generation::bump();
+    jetbeep_core::executor::cancel_stale();
+
     match CURRENT_APP.swap(APP_NONE, Ordering::Relaxed) {
         APP_SERVICE_MENU => unsafe { service_menu_app::app_teardown() },
         APP_SELECTED => unsafe { project_app::app_teardown() },
@@ -49,6 +52,9 @@ fn launch_app(target: LaunchTarget) {
             CURRENT_APP.store(APP_SELECTED, Ordering::Relaxed);
         }
     }
+
+    // The previous tick was invalidated with the old app generation.
+    lvgl_tick(workq::TASK_ID_INVALID);
 }
 
 struct CliArgs {

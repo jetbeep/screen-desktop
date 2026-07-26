@@ -1,0 +1,57 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "detail": "Configure and build screen-desktop in Debug mode for the selected external app.",
+            "type": "shell",
+            "command": "cmake -S \"${workspaceFolder}\" -B \"${workspaceFolder}/build\" -DAPP_PATH=\"${config:screenDesktop.appPath}\" -DSDL_HOR_RES=${config:screenDesktop.width} -DSDL_VER_RES=${config:screenDesktop.height} -DCMAKE_BUILD_TYPE=Debug && cmake --build \"${workspaceFolder}/build\" -j",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Build api-examples",
+            "detail": "Configure and build the bundled api-examples app in Debug mode.",
+            "type": "shell",
+            "command": "cmake -S \"${workspaceFolder}\" -B \"${workspaceFolder}/build-api-examples\" -DAPP_PATH=\"${workspaceFolder}/examples/api-examples\" -DSDL_HOR_RES=${config:screenDesktop.width} -DSDL_VER_RES=${config:screenDesktop.height} -DCMAKE_BUILD_TYPE=Debug && cmake --build \"${workspaceFolder}/build-api-examples\" -j",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Clean",
+            "detail": "Remove the selected-app, api-examples, and Release build directories.",
+            "type": "shell",
+            "command": "cmake -E remove_directory \"${workspaceFolder}/build\" && cmake -E remove_directory \"${workspaceFolder}/build-api-examples\" && cmake -E remove_directory \"${workspaceFolder}/build-release\"",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Create release",
+            "detail": "Build in Release mode and package the binary with the selected app resources.",
+            "type": "shell",
+            "command": "bash \"${workspaceFolder}/scripts/create_release.sh\" \"${config:screenDesktop.appPath}\" ${config:screenDesktop.width} ${config:screenDesktop.height}",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}

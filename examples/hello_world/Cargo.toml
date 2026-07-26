@@ -1,0 +1,19 @@
+[package]
+name = "project_app"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+crate-type = ["rlib"]
+
+[features]
+default = ["simulator"]
+simulator = ["jetbeep_core/simulator"]
+force-http-api = []
+dev-screen-preview = []
+
+[dependencies]
+jetbeep_core = { workspace = true, features = ["platform-desktop"] }
+lvgl-dsl = { workspace = true }

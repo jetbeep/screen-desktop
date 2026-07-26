@@ -1,0 +1,10 @@
+{
+  "title": "JKV asset loaded",
+  "message": "This content was decoded from test.jkv",
+  "sample_number": 42,
+  "features": [
+    "font",
+    "image",
+    "data"
+  ]
+}

@@ -8,6 +8,7 @@ Applications are separate Rust repositories and are never stored in this reposit
 - CMake 3.20 or newer
 - A current Rust toolchain
 - A C/C++ compiler
+- VS Code with the CodeLLDB extension (`vadimcn.vscode-lldb`)
 
 Initialize the C dependencies once:
 
@@ -15,19 +16,47 @@ Initialize the C dependencies once:
 git submodule update --init --recursive
 ```
 
-## Build the simulator fixture
+## VS Code setup
+
+Ready-to-install tasks, settings, and CodeLLDB launch configurations are in
+`vscode_setup/`. Install them into the ignored local `.vscode/` directory:
 
 ```bash
-cmake -S . -B build \
-  -DAPP_PATH="$PWD/tests/simulator-test" \
-  -DCMAKE_BUILD_TYPE=Debug
-cmake --build build -j
-./build/screen_desktop \
-  --fs-root "$PWD/tests/simulator-test/fs" \
-  --workspace "$PWD/tests/simulator-test"
+mkdir -p .vscode
+cp vscode_setup/*.json .vscode/
 ```
 
-## Build an external application
+Set `screenDesktop.appPath`, `screenDesktop.width`, and
+`screenDesktop.height` in `.vscode/settings.json`. The app path must be
+absolute and must contain the app's `Cargo.toml`.
+
+Use these VS Code tasks and launch configurations for routine development.
+They provide the required CMake options, build directories, and runtime paths;
+do not invoke CMake or `screen_desktop` manually.
+
+## Build and debug
+
+For the selected app configured by `screenDesktop.appPath`:
+
+1. Run **Tasks: Run Build Task** and select **Build** (or press
+   <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>).
+2. Open **Run and Debug**, select **Debug selected app**, and start debugging.
+   The launch configuration runs the **Build** task automatically.
+
+Bundled examples are available through the same workflow:
+
+- `examples/hello_world`: set `screenDesktop.appPath` to its absolute path,
+  then use **Build** or **Debug selected app**.
+- `examples/api-examples`: run the **Build api-examples** task or select
+  **Debug api-examples**. This does not change the selected external app build.
+
+Other provided tasks are **Clean**, which removes generated build directories,
+and **Create release**, which creates a Release build and packages the selected
+app in `releases/`.
+
+See `vscode_setup/README.md` for the complete task and release workflow.
+
+## External application contract
 
 `APP_PATH` must point to a crate named `project_app`. The crate is attached to the
 host Cargo workspace and inherits the SDK dependencies selected by screen-desktop.
@@ -60,15 +89,6 @@ The app exports these lifecycle functions:
 pub unsafe fn app_main() { /* create UI and start tasks */ }
 pub unsafe fn app_teardown() { /* release UI and app state */ }
 pub unsafe fn app_init_screen() -> i32 { 0 }
-```
-
-Build it by absolute path:
-
-```bash
-cmake -S . -B build \
-  -DAPP_PATH=/absolute/path/to/project-app \
-  -DCMAKE_BUILD_TYPE=Debug
-cmake --build build -j
 ```
 
 Optional app resources are resolved relative to `APP_PATH`:

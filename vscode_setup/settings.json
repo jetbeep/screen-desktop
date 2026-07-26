@@ -1,0 +1,9 @@
+{
+    "screenDesktop.appPath": "/absolute/path/to/project-app",
+    "screenDesktop.width": 1280,
+    "screenDesktop.height": 800,
+    "rust-analyzer.linkedProjects": [
+        "rust/Cargo.toml"
+    ],
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json"
+}
