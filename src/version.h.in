@@ -1,0 +1,6 @@
+#ifndef SCREEN_DESKTOP_VERSION_H
+#define SCREEN_DESKTOP_VERSION_H
+
+#define APP_VERSION "@APP_VERSION@"
+
+#endif

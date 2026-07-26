@@ -1,0 +1,10 @@
+/build*/
+/rust/app_selected
+/rust/target/
+/target/
+.DS_Store
+.env
+.envrc
+__pycache__/
+*.o
+*.a

@@ -1,0 +1,29 @@
+{
+  "device_settings": {
+    "crc32_hash": 0
+  },
+  "lockers": [
+    {
+      "width": 40,
+      "depth": 50,
+      "open_check_policy": "always",
+      "cells": [
+        {
+          "cell_name": "1",
+          "height": 30,
+          "size": "Medium",
+          "board_id": 1,
+          "lock_id": 1
+        },
+        {
+          "cell_name": "2",
+          "height": 30,
+          "size": "Small",
+          "board_id": 1,
+          "lock_id": 2,
+          "pinpad": true
+        }
+      ]
+    }
+  ]
+}

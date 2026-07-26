@@ -1,0 +1,31 @@
+[workspace]
+members = [".", "app_selected"]
+resolver = "2"
+
+[workspace.dependencies]
+jetbeep_core = { package = "jetbeep-core", git = "https://github.com/jetbeep/rust-libs.git", branch = "main", default-features = false }
+jkv = { git = "https://github.com/jetbeep/rust-libs.git", branch = "main" }
+lvgl-dsl = { git = "https://github.com/jetbeep/rust-libs.git", branch = "main" }
+fonts-cache = { git = "https://github.com/jetbeep/rust-libs.git", branch = "main" }
+
+[package]
+name = "rustapp"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+
+[features]
+default = ["simulator"]
+simulator = ["project_app/simulator", "service_menu_app/simulator", "jetbeep_core/simulator"]
+force-http-api = ["project_app/force-http-api"]
+dev-screen-preview = ["project_app/dev-screen-preview"]
+
+[dependencies]
+jetbeep_core = { workspace = true, features = ["platform-desktop"] }
+project_app = { path = "app_selected" }
+service_menu_app = { package = "project_app", git = "https://github.com/jetbeep/service-menu.git", branch = "main", default-features = false }
+log = "0.4"
