@@ -20,6 +20,8 @@ fi
 
 APP_PATH="$(cd "$APP_PATH" && pwd)"
 APP_NAME="$(basename "$APP_PATH")"
+# Release names use the product name: strip the repo-convention "rust-app-" prefix.
+APP_NAME="${APP_NAME#rust-app-}"
 APP_VERSION="$(sed -n 's/^version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "$APP_PATH/Cargo.toml" | head -1)"
 PROJECT_VERSION="$(tr -d '[:space:]' < "$REPO_ROOT/VERSION.txt")"
 PLATFORM="$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
@@ -29,7 +31,7 @@ if [[ -z "$APP_VERSION" ]]; then
 fi
 
 BUILD_DIR="$REPO_ROOT/build-release"
-RELEASE_NAME="screen-desktop-${PROJECT_VERSION}-${APP_NAME}-${APP_VERSION}-${PLATFORM}"
+RELEASE_NAME="${APP_NAME}-${APP_VERSION}-screen-desktop-${PROJECT_VERSION}-${PLATFORM}"
 RELEASES_DIR="$REPO_ROOT/releases"
 PACKAGE_DIR="$RELEASES_DIR/$RELEASE_NAME"
 ARCHIVE_PATH="$RELEASES_DIR/$RELEASE_NAME.zip"
