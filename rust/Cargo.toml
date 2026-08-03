@@ -3,10 +3,10 @@ members = [".", "app_selected"]
 resolver = "2"
 
 [workspace.dependencies]
-jetbeep_core = { package = "jetbeep-core", git = "https://github.com/jetbeep/rust-libs.git", tag = "1.0.1", default-features = false }
-jkv = { git = "https://github.com/jetbeep/rust-libs.git", tag = "1.0.1" }
-lvgl-dsl = { git = "https://github.com/jetbeep/rust-libs.git", tag = "1.0.1" }
-fonts-cache = { git = "https://github.com/jetbeep/rust-libs.git", tag = "1.0.1" }
+jetbeep_core = { package = "jetbeep-core", git = "https://github.com/jetbeep/rust-libs.git", tag = "1.0.2", default-features = false }
+jkv = { git = "https://github.com/jetbeep/rust-libs.git", tag = "1.0.2" }
+lvgl-dsl = { git = "https://github.com/jetbeep/rust-libs.git", tag = "1.0.2" }
+fonts-cache = { git = "https://github.com/jetbeep/rust-libs.git", tag = "1.0.2" }
 
 [package]
 name = "rustapp"
@@ -26,6 +26,10 @@ dev-screen-preview = ["project_app/dev-screen-preview"]
 
 [dependencies]
 jetbeep_core = { workspace = true, features = ["platform-desktop"] }
-project_app = { path = "app_selected" }
+# Disable default features so `force-http-api` (project_app's own default) is
+# only enabled when explicitly requested via this crate's `force-http-api`
+# feature (CMake `-DAPP_FORCE_HTTP_API=ON`). Otherwise every simulator build
+# would force the real HTTP backend and the mock build could never activate.
+project_app = { path = "app_selected", default-features = false }
 service_menu_app = { package = "project_app", git = "https://github.com/jetbeep/service-menu.git", branch = "main", default-features = false }
 log = "0.4"
