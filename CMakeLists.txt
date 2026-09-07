@@ -73,6 +73,62 @@ add_compile_definitions(
 )
 set(LV_CONF_BUILD_DISABLE_DEMOS ON CACHE BOOL "" FORCE)
 set(LV_CONF_BUILD_DISABLE_EXAMPLES ON CACHE BOOL "" FORCE)
+
+# Build-time patch: LVGL's SDL driver creates every window without a high-DPI
+# backing store and at logical-point size, so on Retina displays the framebuffer
+# is upscaled and looks blurry. This patch makes every SDL window pixel-perfect:
+#   1. request a high-DPI (physical-pixel) drawable;
+#   2. compute a zoom = LVGL_res / drawable so one LVGL pixel maps to one
+#      physical pixel;
+#   3. resize the window to that zoomed point size (fits the host screen).
+# The driver already scales mouse/resize by dsc->zoom, so input stays correct.
+# Applies to all windows (main app + locker simulator). Idempotent, done with
+# independent replacements; applied to the lvgl submodule working tree, which is
+# never committed.
+set(_lv_sdl_window "${CMAKE_SOURCE_DIR}/third_party/lvgl/src/drivers/sdl/lv_sdl_window.c")
+if(EXISTS "${_lv_sdl_window}")
+    file(READ "${_lv_sdl_window}" _lv_sdl_window_src)
+    set(_lv_sdl_window_orig "${_lv_sdl_window_src}")
+
+    # 1. High-DPI backing store.
+    if(NOT _lv_sdl_window_src MATCHES "SDL_WINDOW_ALLOW_HIGHDPI")
+        string(REPLACE
+            "int flag = SDL_WINDOW_RESIZABLE;"
+            "int flag = SDL_WINDOW_RESIZABLE;\n    flag |= SDL_WINDOW_ALLOW_HIGHDPI; /* screen-desktop pixel-perfect patch */"
+            _lv_sdl_window_src "${_lv_sdl_window_src}")
+    endif()
+
+    # 2. Compute pixel-perfect zoom right after the renderer exists.
+    if(NOT _lv_sdl_window_src MATCHES "SDL_GetRendererOutputSize")
+        string(REPLACE
+            "LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);"
+            "LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);\n    { /* screen-desktop pixel-perfect patch: map one LVGL pixel to one physical pixel */\n        int _pp_w = 0, _pp_h = 0;\n        SDL_GetRendererOutputSize(dsc->renderer, &_pp_w, &_pp_h);\n        if(_pp_w > hor_res) dsc->zoom = (float)hor_res / (float)_pp_w;\n    }"
+            _lv_sdl_window_src "${_lv_sdl_window_src}")
+    endif()
+
+    # 3. Resize the window using the pixel-perfect zoom.
+    if(NOT _lv_sdl_window_src MATCHES "hor_res \\* dsc->zoom")
+        string(REPLACE
+            "SDL_SetWindowSize(dsc->window, hor_res, ver_res);"
+            "SDL_SetWindowSize(dsc->window, (int)((float)hor_res * dsc->zoom), (int)((float)ver_res * dsc->zoom));"
+            _lv_sdl_window_src "${_lv_sdl_window_src}")
+    endif()
+
+    if(NOT _lv_sdl_window_src STREQUAL _lv_sdl_window_orig)
+        if(_lv_sdl_window_src MATCHES "SDL_WINDOW_ALLOW_HIGHDPI"
+           AND _lv_sdl_window_src MATCHES "SDL_GetRendererOutputSize"
+           AND _lv_sdl_window_src MATCHES "hor_res \\* dsc->zoom")
+            file(WRITE "${_lv_sdl_window}" "${_lv_sdl_window_src}")
+            message(STATUS "Patched lv_sdl_window.c: pixel-perfect HiDPI for all windows")
+        else()
+            message(WARNING
+                "Could not fully patch lv_sdl_window.c for pixel-perfect rendering "
+                "(an anchor line changed after an lvgl update). Windows will not be "
+                "pixel-perfect on HiDPI; update the patch in CMakeLists.txt.")
+        endif()
+    endif()
+endif()
+
 add_subdirectory(third_party/lvgl)
 target_include_directories(lvgl PUBLIC ${CMAKE_SOURCE_DIR})
 target_link_libraries(lvgl PUBLIC ${SDL2_TARGET})
